@@ -4,9 +4,6 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Funnel,
-  FunnelChart,
-  LabelList,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -48,18 +45,17 @@ export function AnalyticsPanels({
         <h2 className="font-semibold text-ink">Conversion Funnel</h2>
         <div className="mt-6 h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <FunnelChart>
-              <Tooltip />
-              <Funnel dataKey="count" data={funnel} fill="#2563EB">
-                <LabelList
-                  dataKey="label"
-                  position="right"
-                  fill="#070A12"
-                  stroke="none"
-                  fontSize={12}
-                />
-              </Funnel>
-            </FunnelChart>
+            <div className="mt-5 space-y-3">
+  {funnel.map((step) => (
+    <div
+      key={step.label}
+      className="flex items-center justify-between rounded-md bg-cloud p-3"
+    >
+      <span>{step.label}</span>
+      <span className="font-bold">{step.count}</span>
+    </div>
+  ))}
+</div>
           </ResponsiveContainer>
         </div>
       </section>
