@@ -238,7 +238,7 @@ const completedAppointments = completedLeadIds.size;
     cancelled: cancelledAppointments,
     noShow: noShowAppointments,
     conversionRate: percent(bookedAppointments, totalLeads),
-    completionRate: percent(completedAppointments, totalAppointments),
+    completionRate: percent(completedLeadIds.size, bookedLeadIds.size),
     noShowRate: percent(noShowAppointments, totalAppointments)
   };
 
