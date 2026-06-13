@@ -71,7 +71,7 @@ export async function getLeadDetail(id: string) {
   const [
     { data: lead, error: leadError },
     { data: appointments, error: appointmentError },
-    { data: calls, error: callError }
+{ data: calls, error: callsError }
   ] = await Promise.all([
     supabase.from("leads").select("*").eq("id", id).maybeSingle(),
     supabase
@@ -88,7 +88,7 @@ export async function getLeadDetail(id: string) {
 
   if (leadError) throw leadError;
   if (appointmentError) throw appointmentError;
-  if (callError) throw callError;
+  if (callsError) throw callsError;
 
   return {
     lead: lead as Lead | null,
@@ -171,7 +171,7 @@ export async function getAnalyticsData() {
   const [
     { data: leads, error: leadsError },
     { data: appointments, error: appointmentError },
-    { data: calls, error: callsError }
+    { count: callsCount, error: callsError }
   ] = await Promise.all([
     supabase.from("leads").select("id, created_at, source, status"),
     supabase.from("appointments").select("id, status, date"),
@@ -210,10 +210,10 @@ export async function getAnalyticsData() {
 
   const funnel: FunnelStep[] = [
     { label: "Leads", count: totalLeads, percentage: percentValue(totalLeads, totalLeads) },
-    { 
+    {
   label: "Calls",
-  count: calls.length,
-  percentage: percentValue(calls.length, totalLeads)
+  count: callsCount ?? 0,
+  percentage: percentValue(callsCount ?? 0, totalLeads)
 },
     { label: "Qualified", count: qualifiedLeads, percentage: percentValue(qualifiedLeads, totalLeads) },
     { label: "Booked", count: bookedAppointments, percentage: percentValue(bookedAppointments, totalLeads) },
