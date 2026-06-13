@@ -129,7 +129,7 @@ export async function getDashboardData() {
   ] = await Promise.all([
     supabase.from("users").select("id", { count: "exact", head: true }),
     supabase.from("leads").select("id, status, created_at"),
-    supabase.from("appointments").select("id, status, date"),
+    supabase.from("appointments").select("id, lead_id, status, date"),
     supabase.from("calls").select("id", { count: "exact", head: true })
   ]);
 
@@ -183,13 +183,25 @@ export async function getAnalyticsData() {
   if (callsError) throw callsError;
 
   const leadRows = (leads ?? []) as Pick<Lead, "id" | "created_at" | "source" | "status">[];
-  const appointmentRows = (appointments ?? []) as Pick<Appointment, "id" | "date" | "status">[];
+  const appointmentRows = (appointments ?? []) as Pick<Appointment, "id" | "lead_id" | "date" | "status">[];
   const totalLeads = leadRows.length;
   const qualifiedLeads = leadRows.filter((lead) =>
     statusMatches(lead.status, ["Qualified", "Appointment Booked"])
   ).length;
-  const bookedAppointments = appointmentRows.filter((appointment) => appointment.status === "Booked").length;
-  const completedAppointments = appointmentRows.filter((appointment) => appointment.status === "Completed").length;
+const bookedLeadIds = new Set(
+  appointmentRows
+    .filter((appointment) => appointment.status === "Booked")
+    .map((appointment) => appointment.lead_id)
+);
+
+const completedLeadIds = new Set(
+  appointmentRows
+    .filter((appointment) => appointment.status === "Completed")
+    .map((appointment) => appointment.lead_id)
+);
+
+const bookedAppointments = bookedLeadIds.size;
+const completedAppointments = completedLeadIds.size;
   const cancelledAppointments = appointmentRows.filter((appointment) => appointment.status === "Cancelled").length;
   const noShowAppointments = appointmentRows.filter((appointment) => appointment.status === "No Show").length;
   const totalAppointments = appointmentRows.length;
